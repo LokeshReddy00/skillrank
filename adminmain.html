@@ -254,8 +254,19 @@
 
         <div>
           <label for="course"><i class="fas fa-book"></i> Course</label>
-          <input type="text" id="course" required>
+          <select id="course" required>
+            <option value="" disabled selected>Select Course</option>
+            <option value="B.Tech">B.Tech</option>
+            <option value="M.Tech">M.Tech</option>
+            <option value="MBA">MBA</option>
+            <option value="B.Sc">B.Sc</option>
+            <option value="M.Sc">M.Sc</option>
+            <option value="Ph.D">Ph.D</option>
+            <option value="Diploma">Diploma</option>
+            <option value="Other">Other</option>
+          </select>
         </div>
+        
 
         <div>
           <label for="grade"><i class="fas fa-graduation-cap"></i> Grade</label>
@@ -298,67 +309,62 @@
   <!-- AOS JS for animations -->
   <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
   <script>
-    AOS.init();
+   AOS.init();
 
-    document.getElementById('studentForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-      
-      const form = event.target;
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const mobile = document.getElementById('mobile').value.trim();
-      const university = document.getElementById('university').value.trim();
-      const place = document.getElementById('place').value.trim();
-      const course = document.getElementById('course').value.trim();
-      const role = document.getElementById('role').value.trim();
-      const photo = document.getElementById('photo').files[0];
+   document.getElementById('studentForm').addEventListener('submit', function (event) {
+    event.preventDefault();
 
-      // Basic Validation Check
-      if (!name || !email || !mobile || !university || !place || !course || !role) {
-        alert("Please fill out all required fields.");
-        return;
-      }
+    const form = event.target;
 
-      // Show the spinner
-      document.getElementById('spinnerContainer').style.display = 'flex';
+    // Create FormData object
+    const formData = new FormData();
+    formData.append('name', document.getElementById('name').value.trim());
+    formData.append('email', document.getElementById('email').value.trim());
+    formData.append('phone', document.getElementById('mobile').value.trim());
+    formData.append('university_name', document.getElementById('university').value.trim());
+    formData.append('place', document.getElementById('place').value.trim());
+    formData.append('course', document.getElementById('course').value.trim());
+    formData.append('grade', document.getElementById('grade').value.trim());
+    formData.append('linkedin', document.getElementById('linkedin').value.trim());
+    formData.append('current_role', document.getElementById('role').value.trim());
 
-      const studentData = {
-        name,
-        email,
-        mobile,
-        university,
-        place,
-        course,
-        grade: document.getElementById('grade').value.trim(),
-        linkedin: document.getElementById('linkedin').value.trim(),
-        role,
-        photo: photo ? photo.name : null
-      };
+    // Show spinner
+    document.getElementById('spinnerContainer').style.display = 'flex';
 
-      fetch('https://api.skillrank.online/public/api/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(studentData)
-      })
-      .then(response => response.json())
-      .then(data => {
+    // API Call with FormData
+    fetch('https://api.skillrank.online/public/api/add', {
+      method: 'POST',
+      body: formData, // Send FormData directly
+    })
+      .then(async (response) => {
+        // Hide spinner
         document.getElementById('spinnerContainer').style.display = 'none';
 
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `Server error: ${response.status} ${response.statusText} - ${errorText}`
+          );
+        }
+
+        return response.json();
+      })
+      .then((data) => {
         if (data.status === '1602') {
           alert("Student added successfully.");
           form.reset();
         } else {
-          alert("Failed to add student.");
+          throw new Error(
+            data.message || "Unknown error occurred while adding student."
+          );
         }
       })
-      .catch(error => {
-        document.getElementById('spinnerContainer').style.display = 'none';
-        console.error('Error:', error);
-        alert("There was an error submitting the form.");
+      .catch((error) => {
+        // console.error('Error:', error);
+        form.reset();
+        // alert(`Failed to add student: ${error.message}`);
       });
-    });
+  });
   </script>
 </body>
 </html>
