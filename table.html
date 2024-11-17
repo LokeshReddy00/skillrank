@@ -185,7 +185,7 @@
     <div class="filter-container">
       <select id="courseFilter" onchange="enablePasswordInput()">
         <option value="">Select a Course 👩‍🎓</option>
-        <option value="MBA">📚 MBA</option>
+        <option value="Data science">📚 Data science</option>
         <option value="M.Tech">👨‍🔧 M.Tech</option>
         <option value="B.Tech">👩‍💻 B.Tech</option>
         <option value="BBA">📈 BBA</option>
@@ -201,19 +201,37 @@
   </div>
 
   <script>
-    let students = [
-      { name: "Aman Sharma", role: "Chief of Staff", course: "MBA", grade: "A", email: "aman.sharma@example.com", mobile: "1234567890", university: "XYZ University", place: "Delhi", linkedin: "https://linkedin.com/in/aman" },
-      { name: "Sara Khan", role: "Project Manager", course: "MBA", grade: "A+", email: "sara.khan@example.com", mobile: "9876543210", university: "ABC University", place: "Mumbai", linkedin: "https://linkedin.com/in/sara" },
-      { name: "Rahul Verma", role: "Data Scientist", course: "M.Tech", grade: "A", email: "rahul.verma@example.com", mobile: "5678901234", university: "LMN Institute", place: "Bangalore", linkedin: "https://linkedin.com/in/rahul" },
-      { name: "Priya Kapoor", role: "Software Engineer", course: "B.Tech", grade: "A", email: "priya.kapoor@example.com", mobile: "6789012345", university: "PQR University", place: "Chennai", linkedin: "https://linkedin.com/in/priya" },
-      { name: "Aditya Nair", role: "Marketing Executive", course: "BBA", grade: "B+", email: "aditya.nair@example.com", mobile: "3456789012", university: "UVW College", place: "Kochi", linkedin: "https://linkedin.com/in/aditya" },
-      { name: "Neha Gupta", role: "Financial Analyst", course: "MBA", grade: "A+", email: "neha.gupta@example.com", mobile: "4567890123", university: "STU School of Business", place: "Hyderabad", linkedin: "https://linkedin.com/in/neha" },
-      { name: "Rohan Das", role: "AI Specialist", course: "PhD", grade: "A", email: "rohan.das@example.com", mobile: "2345678901", university: "XYZ Research Center", place: "Pune", linkedin: "https://linkedin.com/in/rohan" },
-      { name: "Anjali Mehta", role: "Business Analyst", course: "MBA", grade: "A", email: "anjali.mehta@example.com", mobile: "1230984567", university: "ABC Business School", place: "Delhi", linkedin: "https://linkedin.com/in/anjali" },
-    ];
+let students = [];
+
+fetch("https://api.skillrank.online/public/api/getrecords")
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Network response was not ok " + response.statusText);
+    }
+    return response.json();
+  })
+  .then((apiData) => {
+    students = apiData.map((item) => ({
+      name: item.name,
+      role: item.current_role,
+      course: item.course,
+      grade: item.grade,
+      email: item.email,
+      mobile: item.phone,
+      university: item.university_name,
+      place: item.place,
+      linkedin: item.linkedin,
+    }));
+
+    // console.log("Populated students array:", students);
+  })
+  .catch((error) => {
+    // console.error("Error fetching the API data:", error);
+  });
+
 
     const coursePasswords = {
-      "MBA": "mba123",
+      "Data science": "mba123",
       "M.Tech": "mtech123",
       "B.Tech": "btech123",
       "BBA": "bba123",
